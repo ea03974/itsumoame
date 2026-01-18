@@ -1,0 +1,73 @@
+name: itsumoame
+description: A new Flutter project.
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.10.1
+  shared_preferences: ^2.5.4
+  just_audio: ^0.9.35
+  google_fonts: ^6.1.0
+  google_mobile_ads: ^5.0.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/movies/opening.mp4
+    - assets/movies/evolve.mp4
+    - assets/bgm/rain.mp3
+    - assets/bgm/gacha.mp3
+    - assets/bgm/team1.mp3
+    - assets/bgm/team2.mp3
+    - assets/bgm/team3.mp3
+    - assets/bgm/team4.mp3
+    - assets/bgm/team5.mp3
+    - assets/bgm/team6.mp3
+    - assets/bgm/team7.mp3
+    - assets/bgm/team8.mp3
+    - assets/bgm/team9.mp3
+    - assets/team/
+    - assets/bg/bg1.webp
+    - assets/bg/bg2.webp
+    - assets/button/button1.webp
+    - assets/button/button2.webp
+    - assets/cards1/unknown.webp
+    - assets/cards1/obsidianknights1/
+    - assets/cards1/yellowskulls1/
+    - assets/cards1/whitevine1/
+    - assets/cards1/shien1/
+    - assets/cards1/goldserpents1/
+    - assets/cards1/blueblood1/
+    - assets/cards1/rubystorm1/
+    - assets/cards1/shadows1/
+    - assets/cards1/normad1/
+    - assets/cards2/obsidianknights2/
+    - assets/cards2/yellowskulls2/
+    - assets/cards2/whitevine2/
+    - assets/cards2/shien2/
+    - assets/cards2/goldserpents2/
+    - assets/cards2/blueblood2/
+    - assets/cards2/rubystorm2/
+    - assets/cards2/shadows2/
+    - assets/cards2/normad2/
+    - assets/enemy/enemy1.webp
+    - assets/gacha/core.webp
+    - assets/gacha/scanline.webp
+
+
+
+
+
