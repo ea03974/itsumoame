@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'data/user_characters.dart';
 import '../pages/gacha/gacha_globals.dart';
 
+// ★ ロゴフェードトランジション
+import '../widgets/transition1.dart';
+
+// ★ 各ページ
+import '../pages/story/story_list_page.dart';
+import '../pages/mission/mission_page.dart';
+import '../pages/gacha/single_gacha_page.dart';
+import '../pages/team/team_list_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -10,17 +19,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  /// ===== 総戦力を再計算する共通メソッド =====
-  void _recalculateTotalPower() {
-    totalPowerNotifier.value =
-        userCharacters.fold(0, (sum, c) => sum + c.power);
-  }
-
   @override
   void initState() {
     super.initState();
-    _recalculateTotalPower(); // 初回表示
+    // ★ 初回表示時に総戦力を再計算
+    recalculateTotalPower();
+  }
+
+  /// ★ ロゴフェード付き遷移（共通）
+  /// 戻ってきたら必ず再計算する（戻り値は使わない）
+  Future<void> _pushWithLogoB(Widget page) async {
+    await Navigator.of(context).push(
+      LogoBFadeRoute(nextPage: page),
+    );
+
+    // ★ Home に戻ったタイミングで再計算
+    recalculateTotalPower();
   }
 
   @override
@@ -30,18 +44,18 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            // 背景
+            // ===== 背景 =====
             Positioned.fill(
               child: Image.asset(
                 'assets/bg/bg1.webp',
                 fit: BoxFit.cover,
               ),
             ),
+
             Column(
               children: [
                 const SizedBox(height: 20),
 
-                /// HOME タイトル
                 const Text(
                   'HOME',
                   style: TextStyle(
@@ -53,7 +67,7 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 12),
 
-                /// 総戦力表示（自動更新）
+                /// ===== 総戦力 =====
                 ValueListenableBuilder<int>(
                   valueListenable: totalPowerNotifier,
                   builder: (context, totalPower, _) {
@@ -73,7 +87,7 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 6),
 
-                /// ★ ダイヤ表示（追加）
+                /// ===== ダイヤ =====
                 ValueListenableBuilder<int>(
                   valueListenable: diamondNotifier,
                   builder: (context, diamond, _) {
@@ -93,6 +107,7 @@ class _HomePageState extends State<HomePage> {
 
                 const Spacer(),
 
+                /// ===== ボタン群 =====
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
@@ -100,37 +115,30 @@ class _HomePageState extends State<HomePage> {
                       _HomeButton(
                         label: 'Story',
                         icon: Icons.menu_book,
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/story_list'),
+                        onTap: () {
+                          _pushWithLogoB(const StoryListPage());
+                        },
                       ),
                       _HomeButton(
                         label: 'Mission',
                         icon: Icons.flag,
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/mission'),
+                        onTap: () {
+                          _pushWithLogoB(const MissionPage());
+                        },
                       ),
-
-                      /// ===== Gacha =====
                       _HomeButton(
                         label: 'Gacha',
                         icon: Icons.casino,
-                        onTap: () async {
-                          final updated = await Navigator.pushNamed(
-                            context,
-                            '/gacha',
-                          );
-
-                          if (updated == true) {
-                            _recalculateTotalPower();
-                          }
+                        onTap: () {
+                          _pushWithLogoB(const SingleGachaPage());
                         },
                       ),
-
                       _HomeButton(
                         label: 'Team List',
                         icon: Icons.groups,
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/team_list'),
+                        onTap: () {
+                          _pushWithLogoB(const TeamListPage());
+                        },
                       ),
                     ],
                   ),

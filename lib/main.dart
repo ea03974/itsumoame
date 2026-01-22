@@ -5,7 +5,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart'; // ★追加
 import 'ads/reward_ad_manager.dart';
 
-
 // Pages
 import 'title_page.dart';
 import 'home_page.dart';
@@ -14,7 +13,10 @@ import 'pages/story/story_list_page.dart';
 import 'pages/mission/mission_page.dart';
 import 'pages/gacha/gacha_page.dart';
 import 'pages/team/team_list_page.dart';
-import 'data/save_manager.dart'; // ← 既存
+import 'data/save_manager.dart';
+
+// ★ 追加：総戦力再計算用
+import 'data/user_characters.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +30,11 @@ void main() async {
   // ★ セーブデータロード
   await SaveManager.load();
 
+  // ★ 起動時に一度だけ総戦力を再計算
+  recalculateTotalPower();
+
   runApp(const MyApp());
 }
-
 
 // =====================
 // RouteObserver（必須）

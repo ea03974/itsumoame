@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../pages/gacha/gacha_globals.dart';
 import 'mission1_execute_page.dart';
+import '../../ads/reward_ad_manager.dart';
 
 class MissionPage extends StatefulWidget {
   const MissionPage({super.key});
@@ -43,10 +44,9 @@ class _MissionPageState extends State<MissionPage> {
   /// =========================
   Future<void> _loadCooldowns() async {
     final prefs = await SharedPreferences.getInstance();
-
     for (int i = 0; i < 5; i++) {
       final millis = prefs.getInt('$prefsKey$i');
-      if (millis != null) {
+      if (millis != null && millis > 0) {
         _nextAvailableTimes[i] =
             DateTime.fromMillisecondsSinceEpoch(millis);
       }
@@ -57,12 +57,9 @@ class _MissionPageState extends State<MissionPage> {
   /// =========================
   /// クールタイム保存
   /// =========================
-  Future<void> _saveCooldown(int index, DateTime time) async {
+  Future<void> _saveCooldown(int index, int millis) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(
-      '$prefsKey$index',
-      time.millisecondsSinceEpoch,
-    );
+    await prefs.setInt('$prefsKey$index', millis);
   }
 
   bool _isOnCooldown(int index) {
@@ -86,20 +83,42 @@ class _MissionPageState extends State<MissionPage> {
         '${seconds.toString().padLeft(2, '0')}';
   }
 
+  /// =========================
+  /// ミッション開始（通常）
+  /// =========================
   void _startMission(int index) {
     final nextTime =
         DateTime.now().add(const Duration(seconds: cooldownSeconds));
 
     _nextAvailableTimes[index] = nextTime;
-    _saveCooldown(index, nextTime);
+    _saveCooldown(index, nextTime.millisecondsSinceEpoch);
 
-   Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const Mission1ExecutePage(),
-  ),
-);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Mission1ExecutePage(),
+      ),
+    );
+  }
 
+  /// =========================
+  /// 広告視聴 → クール解除
+  /// =========================
+  void _watchAdAndSkip(int index) {
+    RewardAdManager.instance.show(
+      onRewarded: () async {
+        _nextAvailableTimes[index] = null;
+        await _saveCooldown(index, 0);
+        setState(() {});
+      },
+      onNotReady: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('広告準備中です。しばらくお待ちください'),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -112,78 +131,101 @@ class _MissionPageState extends State<MissionPage> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          final power = totalPowerNotifier.value;
-          final canPower = power >= requiredPower[index];
-          final onCooldown = _isOnCooldown(index);
-          final enabled = canPower && !onCooldown;
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: GestureDetector(
-              onTap: enabled ? () => _startMission(index) : null,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: enabled
-                      ? Colors.grey.shade900
-                      : Colors.grey.shade800,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: enabled ? Colors.white : Colors.white24,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.flag,
-                      color:
-                          enabled ? Colors.white : Colors.white38,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Mission ${index + 1}',
-                            style: TextStyle(
-                              color: enabled
-                                  ? Colors.white
-                                  : Colors.white38,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            '必要戦力：${requiredPower[index]}',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                          if (onCooldown) ...[
-                            const SizedBox(height: 6),
-                            Text(
-                              _remainingTimeText(index),
-                              style: const TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ],
+      /// ★ 総戦力を購読
+      body: ValueListenableBuilder<int>(
+        valueListenable: totalPowerNotifier,
+        builder: (context, totalPower, _) {
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              final canPower = totalPower >= requiredPower[index];
+              final onCooldown = _isOnCooldown(index);
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: GestureDetector(
+                  onTap: () {
+                    if (!canPower) return;
+
+                    if (onCooldown) {
+                      _watchAdAndSkip(index);
+                    } else {
+                      _startMission(index);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: onCooldown
+                          ? Colors.grey.shade800
+                          : Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: onCooldown
+                            ? Colors.white24
+                            : Colors.white,
                       ),
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.flag,
+                          color: onCooldown
+                              ? Colors.white38
+                              : Colors.white,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mission ${index + 1}',
+                                style: TextStyle(
+                                  color: onCooldown
+                                      ? Colors.white38
+                                      : Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '必要戦力：${requiredPower[index]}',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              if (onCooldown) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  _remainingTimeText(index),
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  '📺 広告を観て待ち時間スキップ',
+                                  style: TextStyle(
+                                    color: Colors.lightBlueAccent,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),

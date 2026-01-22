@@ -367,7 +367,7 @@ final Map<String, String> roleNameJaMap = {
   '★6 Ability Users': '特異能力者',
 };
 
-/* =====================
+/* =====================  
    Team Role Text Page
 ===================== */
 class TeamRoleTextPage extends StatelessWidget {
@@ -377,6 +377,11 @@ class TeamRoleTextPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final roles = teams[teamName] ?? {};
+
+    // =====================
+    // ★ 使用するボタン画像（1種類のみ）
+    // =====================
+    const buttonImage = 'assets/button/button7.webp';
 
     // 共通：Orbitron + Noto Sans JP + 縁取り影
     TextStyle baseGameTextStyle({
@@ -390,7 +395,6 @@ class TeamRoleTextPage extends StatelessWidget {
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
         color: Colors.white,
-        
         shadows: const [
           Shadow(offset: Offset(1, 0), color: Colors.black),
           Shadow(offset: Offset(-1, 0), color: Colors.black),
@@ -462,30 +466,35 @@ class TeamRoleTextPage extends StatelessWidget {
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 110,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(14),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => RoleMemberGridPage(
-                                      roleName: role,
-                                      members: roleMembers,
-                                    ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RoleMemberGridPage(
+                                    roleName: role,
+                                    members: roleMembers,
                                   ),
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: AspectRatio(
+                                // =====================
+                                // ★ 縦横比固定（高さは自動）
+                                // =====================
+                                aspectRatio: 3.6 / 1,
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
-                                    // ボタン背景画像
+                                    // =====================
+                                    // ★ button7 固定
+                                    //   縦横比維持・切れない
+                                    // =====================
                                     Image.asset(
-                                      'assets/button/button1.webp',
+                                      buttonImage,
                                       fit: BoxFit.contain,
                                       alignment: Alignment.center,
                                     ),
@@ -538,6 +547,7 @@ class TeamRoleTextPage extends StatelessWidget {
     );
   }
 }
+
 
 /* =====================
    Role Name Helper

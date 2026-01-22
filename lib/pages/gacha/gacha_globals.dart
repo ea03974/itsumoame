@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// =========================
-/// 総戦力（UIと実体を兼ねる）
+/// 総戦力（UI表示専用 Notifier）
+/// ※ 実体・計算は user_characters.dart 側
 /// =========================
 final ValueNotifier<int> totalPowerNotifier = ValueNotifier<int>(0);
 

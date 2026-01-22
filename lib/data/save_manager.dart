@@ -20,22 +20,20 @@ class SaveManager {
         prefs.getStringList('userCharacters') ?? [];
 
     userCharacters.clear();
+    ownedCharacterIds.clear();
 
     for (final id in characterIds) {
       try {
         final character = membersMaster.firstWhere((c) => c.id == id);
         userCharacters.add(character);
+        ownedCharacterIds.add(id);
       } catch (e) {
         debugPrint('⚠ 不明なキャラIDをスキップ: $id');
       }
     }
 
-    /// ---- 総戦力再計算 ----
-    int total = 0;
-    for (final c in userCharacters) {
-      total += c.power;
-    }
-    totalPowerNotifier.value = total;
+    // ★ 総戦力はここでは一切触らない
+    // ★ 再計算は main.dart / HomePage 側に任せる
   }
 
   /// =========================
@@ -50,7 +48,7 @@ class SaveManager {
     /// ---- 所持キャラ ----
     await prefs.setStringList(
       'userCharacters',
-      userCharacters.map((c) => c.id).toList(),
+      ownedCharacterIds,
     );
   }
 }

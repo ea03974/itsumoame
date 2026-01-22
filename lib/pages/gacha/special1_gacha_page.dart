@@ -8,7 +8,6 @@ import '../../data/user_characters.dart';
 import '../../data/user_currency.dart';
 import '../../data/team_acquire_master.dart';
 import '../../data/acquire_type.dart';
-import 'gacha_globals.dart';
 import '../../widgets/background_scaffold.dart';
 
 class Special1GachaPage extends StatefulWidget {
@@ -22,19 +21,18 @@ class _Special1GachaPageState extends State<Special1GachaPage> {
   Character? _gachaResult;
   final Random _random = Random();
 
-  /// ===== 単発ガチャ消費コスト（将来用）=====
-  static const int singleGachaCost = 600;
+  /// ===== 単発ガチャ消費コスト =====
+  static const int singleGachaCost = 6;
 
   // 特別ガチャ①（Blue Blood）
   void _pullGacha() {
     if (membersMaster.isEmpty) return;
 
-    // ===== 実機テスト用：ダイヤ消費なし =====
-     final success = spendDiamonds(singleGachaCost);
-     if (!success) {
-       _showNotEnoughDiamondDialog();
-       return;
-     }
+    final success = spendDiamonds(singleGachaCost);
+    if (!success) {
+      _showNotEnoughDiamondDialog();
+      return;
+    }
 
     /// ===== Blue Blood 専用抽選 =====
     final specialMembers = membersMaster.where((c) {
@@ -47,12 +45,14 @@ class _Special1GachaPageState extends State<Special1GachaPage> {
     final randomIndex = _random.nextInt(specialMembers.length);
     final character = specialMembers[randomIndex];
 
-    /// ===== 所持キャラに追加 =====
+    /// ===== 所持キャラ追加（重複は内部で無視）=====
     addCharacter(character);
+
+    /// ★ 総戦力は user_characters 側で再計算
+    recalculateTotalPower();
 
     setState(() {
       _gachaResult = character;
-      totalPowerNotifier.value += character.power;
     });
 
     showDialog(
@@ -98,7 +98,7 @@ class _Special1GachaPageState extends State<Special1GachaPage> {
     );
   }
 
-  /// ダイヤ不足ダイアログ（将来用）
+  /// ダイヤ不足ダイアログ
   void _showNotEnoughDiamondDialog() {
     showDialog(
       context: context,
@@ -150,7 +150,10 @@ class _Special1GachaPageState extends State<Special1GachaPage> {
     return BackgroundScaffold(
       backgroundImage: 'assets/bg/gacha_bg.webp',
       appBar: AppBar(
-        title: Text('特別ガチャ（Blue Blood）', style: baseGameTextStyle(fontSize: 18)),
+        title: Text(
+          '特別ガチャ（Blue Blood）',
+          style: baseGameTextStyle(fontSize: 18),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -186,7 +189,7 @@ class _Special1GachaPageState extends State<Special1GachaPage> {
             ],
 
             const Text(
-              '※ 実機テスト中（ダイヤ消費なし）',
+              '※ 実機テスト中（ダイヤ消費あり）',
               style: TextStyle(
                 color: Colors.cyanAccent,
                 fontSize: 14,

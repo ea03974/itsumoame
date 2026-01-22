@@ -6,7 +6,6 @@ import '../../data/user_currency.dart';
 import '../../data/members_master.dart';
 import '../../data/team_acquire_master.dart';
 import '../../data/acquire_type.dart';
-import 'gacha_globals.dart';
 
 class TenGachaPage extends StatefulWidget {
   const TenGachaPage({super.key});
@@ -19,7 +18,7 @@ class _TenGachaPageState extends State<TenGachaPage> {
   final Random _random = Random();
 
   /// ===== 10連ガチャ消費コスト =====
-  static const int tenGachaCost = 3000;
+  static const int tenGachaCost = 30;
 
   /// ガチャ結果（空＝未実行）
   List<Character> _results = [];
@@ -28,15 +27,11 @@ class _TenGachaPageState extends State<TenGachaPage> {
   void _drawTen() {
     if (membersMaster.isEmpty) return;
 
-
-  /// テスト時に操作
-   final success = spendDiamonds(tenGachaCost);
-   if (!success) {
-     _showNotEnoughDiamondDialog();
-     return;
-   }
-
-
+    final success = spendDiamonds(tenGachaCost);
+    if (!success) {
+      _showNotEnoughDiamondDialog();
+      return;
+    }
 
     /// ===== ノーマルガチャ対象のみ抽選 =====
     final normalGachaMembers = membersMaster.where((c) {
@@ -51,14 +46,13 @@ class _TenGachaPageState extends State<TenGachaPage> {
       return normalGachaMembers[index];
     });
 
-    /// ===== 所持キャラ追加（重複防止＋保存）=====
+    /// ===== 所持キャラ追加（重複は内部で無視）=====
     for (final c in drawn) {
       addCharacter(c);
     }
 
-    /// ===== 総戦力反映 =====
-    final addedPower = drawn.fold<int>(0, (sum, c) => sum + c.power);
-    totalPowerNotifier.value += addedPower;
+    /// ★ 総戦力は必ず再計算
+    recalculateTotalPower();
 
     setState(() {
       _results = drawn;

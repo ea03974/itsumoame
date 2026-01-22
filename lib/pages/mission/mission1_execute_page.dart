@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '/data/user_currency.dart';
-import '/ads/reward_ad_manager.dart'; // ★ 追加（重要）
+import '/ads/reward_ad_manager.dart';
 
 class Mission1ExecutePage extends StatefulWidget {
   const Mission1ExecutePage({super.key});
@@ -19,15 +19,21 @@ class _Mission1ExecutePageState extends State<Mission1ExecutePage> {
   /// 勝率（初期50%）
   double _winRate = 0.5;
 
+  /// ★ 広告使用済みフラグ（1ミッション1回）
+  bool _adUsed = false;
+
   final Random _random = Random();
 
   // =======================
   // 広告タップ処理
   // =======================
   void _onTapRewardAd() {
+    if (_adUsed) return;
+
     RewardAdManager.instance.show(
       onRewarded: () {
         setState(() {
+          _adUsed = true;
           _winRate += 0.1;
           if (_winRate > 0.9) _winRate = 0.9;
         });
@@ -93,7 +99,10 @@ class _Mission1ExecutePageState extends State<Mission1ExecutePage> {
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
-              child: const Text('戻る', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                '戻る',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -103,7 +112,10 @@ class _Mission1ExecutePageState extends State<Mission1ExecutePage> {
 
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(text), backgroundColor: Colors.black),
+      SnackBar(
+        content: Text(text),
+        backgroundColor: Colors.black,
+      ),
     );
   }
 
@@ -113,6 +125,7 @@ class _Mission1ExecutePageState extends State<Mission1ExecutePage> {
   @override
   Widget build(BuildContext context) {
     final bool isAdReady = RewardAdManager.instance.isReady;
+    final bool canWatchAd = isAdReady && !_adUsed;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -140,20 +153,24 @@ class _Mission1ExecutePageState extends State<Mission1ExecutePage> {
             /// 成功率UP（広告）
             /// =======================
             GestureDetector(
-              onTap: isAdReady ? _onTapRewardAd : _onTapRewardAd,
+              onTap: canWatchAd ? _onTapRewardAd : null,
               child: Opacity(
-                opacity: isAdReady ? 1.0 : 0.5,
+                opacity: canWatchAd ? 1.0 : 0.5,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.deepPurple,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Text(
-                    isAdReady
-                        ? '広告を観て成功率UP ${(_winRate * 100).toInt()}%'
-                        : '広告を読み込み中...',
+                    _adUsed
+                        ? '広告は使用済みです'
+                        : isAdReady
+                            ? '広告を観て成功率UP ${(_winRate * 100).toInt()}%'
+                            : '広告を読み込み中...',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

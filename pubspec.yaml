@@ -13,6 +13,7 @@ dependencies:
   video_player: ^2.10.1
   shared_preferences: ^2.5.4
   just_audio: ^0.9.35
+  audioplayers: ^5.2.1
   google_fonts: ^6.1.0
   google_mobile_ads: ^5.0.0
 
@@ -44,6 +45,11 @@ flutter:
     - assets/bg/bg2.webp
     - assets/button/button1.webp
     - assets/button/button2.webp
+    - assets/button/button3.webp
+    - assets/button/button4.webp
+    - assets/button/button5.webp
+    - assets/button/button6.webp
+    - assets/button/button7.webp
     - assets/cards1/unknown.webp
     - assets/cards1/obsidianknights1/
     - assets/cards1/yellowskulls1/
@@ -66,8 +72,12 @@ flutter:
     - assets/enemy/enemy1.webp
     - assets/gacha/core.webp
     - assets/gacha/scanline.webp
-
-
-
-
-
+    - assets/effect/door_r.webp
+    - assets/effect/door_l.webp
+    - assets/effect/door_u.webp
+    - assets/effect/door_d.webp
+    - assets/effect/logo_b.webp
+    - assets/character/sample.webp
+    - assets/se/slash_in.mp3
+    - assets/se/slash_hit.mp3
+    - assets/se/slash_out.mp3

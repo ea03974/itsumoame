@@ -7,20 +7,21 @@ class RewardAdManager {
 
   RewardedAd? _rewardedAd;
   bool _isLoading = false;
+  bool _hasRewarded = false;
 
   bool get isReady => _rewardedAd != null;
 
   String get _adUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917'; // テスト用
+      return 'ca-app-pub-3940256099942544/5224354917'; // Android テスト
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313'; // テスト用
+      return 'ca-app-pub-3940256099942544/1712485313'; // iOS テスト
     }
     throw UnsupportedError('Unsupported platform');
   }
 
   // =========================
-  // 広告ロード（1回だけ）
+  // 広告ロード
   // =========================
   void load() {
     if (_isLoading || _rewardedAd != null) return;
@@ -39,7 +40,7 @@ class RewardAdManager {
             onAdDismissedFullScreenContent: (ad) {
               ad.dispose();
               _rewardedAd = null;
-              load(); // 次を先読み
+              load(); // 次の広告を先読み
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
               ad.dispose();
@@ -59,8 +60,8 @@ class RewardAdManager {
   // 広告表示
   // =========================
   void show({
-    required Function() onRewarded,
-    Function()? onNotReady,
+    required void Function() onRewarded,
+    void Function()? onNotReady,
   }) {
     if (_rewardedAd == null) {
       onNotReady?.call();
@@ -68,8 +69,15 @@ class RewardAdManager {
       return;
     }
 
-    _rewardedAd!.show(
+    _hasRewarded = false;
+
+    final ad = _rewardedAd;
+    _rewardedAd = null; // 二重表示防止
+
+    ad!.show(
       onUserEarnedReward: (_, __) {
+        if (_hasRewarded) return;
+        _hasRewarded = true;
         onRewarded();
       },
     );
