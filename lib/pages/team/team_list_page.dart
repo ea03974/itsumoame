@@ -690,7 +690,7 @@ class _RoleMemberGridPageState extends State<RoleMemberGridPage>
                     context,
                     MaterialPageRoute(
                       builder: (_) => MemberImagePage(
-                        beforeImagePath: member.image!,
+                        beforeImagePath: member.normalImage!,
                         afterImagePath: member.evolvedImage!, // 進化後画像
                       ),
                     ),

@@ -10,25 +10,42 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # --- Animation / Media ---
+  rive: ^0.13.4
   video_player: ^2.10.1
+
+  # --- Storage ---
   shared_preferences: ^2.5.4
+
+  # --- Audio ---
   just_audio: ^0.9.35
   audioplayers: ^5.2.1
+
+  # --- UI / Ads ---
   google_fonts: ^6.1.0
   google_mobile_ads: ^5.0.0
-
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
 
-
 flutter:
   uses-material-design: true
+
   assets:
+    # ===== Movies =====
     - assets/movies/opening.mp4
     - assets/movies/evolve.mp4
+
+    # ===== Rive Animations =====
+    - assets/animations/blue_cube.riv
+    - assets/animations/gacha_loading.riv
+    - assets/animations/gacha_result.riv
+    - assets/animations/home_saver.riv
+
+    # ===== BGM =====
     - assets/bgm/rain.mp3
     - assets/bgm/gacha.mp3
     - assets/bgm/team1.mp3
@@ -40,9 +57,15 @@ flutter:
     - assets/bgm/team7.mp3
     - assets/bgm/team8.mp3
     - assets/bgm/team9.mp3
+
+    # ===== Team =====
     - assets/team/
+
+    # ===== Background =====
     - assets/bg/bg1.webp
     - assets/bg/bg2.webp
+
+    # ===== Buttons =====
     - assets/button/button1.webp
     - assets/button/button2.webp
     - assets/button/button3.webp
@@ -50,6 +73,8 @@ flutter:
     - assets/button/button5.webp
     - assets/button/button6.webp
     - assets/button/button7.webp
+
+    # ===== Cards Lv1 =====
     - assets/cards1/unknown.webp
     - assets/cards1/obsidianknights1/
     - assets/cards1/yellowskulls1/
@@ -60,6 +85,8 @@ flutter:
     - assets/cards1/rubystorm1/
     - assets/cards1/shadows1/
     - assets/cards1/normad1/
+
+    # ===== Cards Lv2 =====
     - assets/cards2/obsidianknights2/
     - assets/cards2/yellowskulls2/
     - assets/cards2/whitevine2/
@@ -69,15 +96,36 @@ flutter:
     - assets/cards2/rubystorm2/
     - assets/cards2/shadows2/
     - assets/cards2/normad2/
+
+    # ===== Cards Lv3 =====
+    - assets/cards3/obsidianknights3/
+    - assets/cards3/yellowskulls3/
+    - assets/cards3/whitevine3/
+    - assets/cards3/shien3/
+    - assets/cards3/goldserpents3/
+    - assets/cards3/blueblood3/
+    - assets/cards3/rubystorm3/
+    - assets/cards3/shadows3/
+    - assets/cards3/normad3/
+
+    # ===== Enemy =====
     - assets/enemy/enemy1.webp
+
+    # ===== Gacha =====
     - assets/gacha/core.webp
     - assets/gacha/scanline.webp
+
+    # ===== Effects =====
     - assets/effect/door_r.webp
     - assets/effect/door_l.webp
     - assets/effect/door_u.webp
     - assets/effect/door_d.webp
     - assets/effect/logo_b.webp
+
+    # ===== Character =====
     - assets/character/sample.webp
+
+    # ===== SE =====
     - assets/se/slash_in.mp3
     - assets/se/slash_hit.mp3
     - assets/se/slash_out.mp3
